@@ -4,6 +4,7 @@ const User = require('../models/User')
 const {sendResponseError} = require('../middleware/middleware')
 const {checkPassword, newToken} = require('../utils/utility.function')
 
+
 const signUpUser = async (req, res) => {
   const {email, fullName, password} = req.body
   try {
@@ -21,7 +22,6 @@ const signUpUser = async (req, res) => {
 
 const signInUser = async (req, res) => {
   const {password, email} = req.body
-  console.log(req.body)
   try {
     const user = await User.findOne({email})
     if (!!!user) {

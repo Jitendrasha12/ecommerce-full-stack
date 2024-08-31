@@ -19,7 +19,8 @@
     "express": "^4.17.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.11.8"
+    "mongoose": "^5.11.8",
+    "razorpay": "^2.9.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
