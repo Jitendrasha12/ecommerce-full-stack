@@ -14,14 +14,12 @@ export const addToCart = createAsyncThunk(
   'cart/addToCart',
   async ({ id, qty }, { rejectWithValue }) => {
     try {
-      console.log(id,qty,'this is cartSlice17...........')
       const { data } = await Api.getRequest(`/api/products/${id}`);
-      console.log('API Response:', data); // Check what the API returns
       
       // Parse if necessary
       const product = JSON.parse(data);
 
-      await Api.postRequest('/api/cart', { productId: id, count: qty });
+      await Api.postRequest('/api/cart', { productId: id, count: qty,amount:product.price });
 
       return {
         product: product._id,
@@ -100,7 +98,6 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload,'this is our payload')
         state.cartItems.push(action.payload);
       })
       .addCase(addToCart.rejected, (state, action) => {

@@ -15,9 +15,8 @@ const ProductScreen = () => {
   const dispatch = useDispatch();
 
   const productDetails = useSelector((state) => state.product);
-  // console.log(productDetails,'this is our product')
   const { loading, error, product } = productDetails;
-   console.log(product,'this is our product20')
+   
 
   useEffect(() => {
     if (product && product._id !== id) {
@@ -27,7 +26,6 @@ const ProductScreen = () => {
 
   const addToCartHandler = () => {
     if (user.isLogin) {
-      console.log(product._id,qty,'{+Product id and quantity')
       dispatch(addToCart({id:product._id, qty}));
       navigate('/cart'); // Use navigate for redirecting
     } else {

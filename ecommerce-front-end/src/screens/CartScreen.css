@@ -52,6 +52,21 @@
   opacity: 0.9;
 }
 
+.checkout-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.checkout-btn.disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+
 @media (max-width: 1320px) {
   .cartscreen {
     max-width: 900px;

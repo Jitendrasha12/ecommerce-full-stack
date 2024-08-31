@@ -1,26 +1,118 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { clearCart } from '../redux/actions/cartSlice'; // Ensure you have this action
-//  import { Elements } from '@stripe/react-stripe-js';
-// import { loadStripe } from '@stripe/stripe-js';
-import PaymentForm from '../components/PaymentForm';
 
 const CheckoutScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const [shippingAddress, setShippingAddress] = useState('');
+  const cart = useSelector((state) => state.cart);
+  const { cartItems } = cart;  
+  const[shippingAddress, setShippingAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const getCartSubTotal = () => {
+    return cartItems
+      .reduce((price, item) => price + item.price * item.qty, 0)
+      .toFixed(2);
+  };
+  const subtotal = getCartSubTotal();
+  // const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // console.log(subtotal,'this is our subtotal')
+
+  // Dynamically load the Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script); // Clean up the script when component unmounts
+    };
+  }, []);
+
+  const handleRazorpayPayment = async () => {
+    try {
+      const response = await fetch('http://localhost:5002/api/order/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          shippingAddress,
+          paymentMethod,
+          amount: subtotal, // Convert amount to paise
+          currency: "INR",
+        }),
+      });
+
+      const data = await response.json();
+     
+
+      if (!data || !data.id || !data.amount) {
+        throw new Error('Failed to create order');
+      }
+
+      const options = {
+        key: "rzp_test_DLIkLvFfZJ8upH",
+        amount: data.amount,
+        currency: 'INR',
+        name: 'Jitendra Firm',
+        description: 'Order Payment',
+        order_id: data.id,
+        handler: async (response) => {
+          try {
+            const verifyResponse = await fetch('http://localhost:5002/api/order/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                orderId: data.id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+            console.log('Verification response:', verifyData);
+
+            if (verifyData.success) {
+              dispatch(clearCart());
+              navigate('/order-success');
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (verifyError) {
+            console.error('Verification failed:', verifyError);
+            alert('Payment verification failed');
+          }
+        },
+        prefill: {
+          name: '', // Add prefilled details if needed
+          email: '',
+          contact: '',
+        },
+        theme: {
+          color: '#528ff0',
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error('Payment failed:', error);
+      alert('Payment failed');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Perform validation and payment processing
-    // For example, integrating with a payment gateway API
-
-    // After successful payment
-    dispatch(clearCart()); // Clear cart after successful payment
-    navigate('/order-success'); // Redirect to a success page or order confirmation page
+    if (paymentMethod === 'razorpay') {
+      handleRazorpayPayment();
+    } else {
+      alert('Please select a valid payment method');
+    }
   };
 
   return (
@@ -48,16 +140,12 @@ const CheckoutScreen = () => {
             required
           >
             <option value="">Select Payment Method</option>
-            <option value="creditCard">Credit Card</option>
-            <option value="paypal">PayPal</option>
+            <option value="razorpay">Razorpay</option>
             {/* Add more payment methods as needed */}
           </select>
         </div>
         <button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg">Place Order</button>
       </form>
-     <div>
-        < PaymentForm />
-     </div>
     </div>
   );
 };

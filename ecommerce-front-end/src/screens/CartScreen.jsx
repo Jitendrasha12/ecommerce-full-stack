@@ -13,12 +13,12 @@ const CartScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const cart = useSelector((state) => state.cart);
   const { loginInfo } = useLogin();
+  const cart = useSelector((state) => state.cart);
   const { cartItems } = cart;
 
   const qtyChangeHandler = (id, qty) => {
-    dispatch(addToCart(id, qty));
+    dispatch(addToCart({id, qty}));
   };
 
   const removeFromCartHandler = (item) => {
@@ -34,6 +34,7 @@ const CartScreen = () => {
       .reduce((price, item) => price + item.price * item.qty, 0)
       .toFixed(2);
   };
+  const subtotal = getCartSubTotal();
 
   const handleProceedBtn = () => {
     navigate('/checkout'); // Redirect to CheckoutScreen
@@ -48,14 +49,14 @@ const CartScreen = () => {
             <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
             {cartItems.length === 0 ? (
               <div className="text-center">
-                Your Cart Is Empty <Link to="/" className="text-blue-500 underline">Go Back</Link>
+                Add items to your cart <Link to="/" className="text-blue-500 underline">Go Back</Link>
               </div>
             ) : (
               cartItems.map((item) => (
                 <CartItem
                   key={item.product}
                   item={item}
-                  qtyChangeHandler={qtyChangeHandler}
+                  // qtyChangeHandler={qtyChangeHandler}
                   removeHandler={() => removeFromCartHandler(item)}
                 />
               ))
@@ -67,11 +68,16 @@ const CartScreen = () => {
               <p className="text-xl font-bold">${getCartSubTotal()}</p>
             </div>
             <button
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed"
               onClick={handleProceedBtn}
+              title={subtotal > 0 ? "Proceed to checkout" : "Add items to your cart"}
+              disabled={subtotal <= 0}
+              aria-disabled={subtotal <= 0}
             >
               Proceed To Checkout
             </button>
+
+
           </div>
         </div>
       </div>

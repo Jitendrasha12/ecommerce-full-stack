@@ -2,7 +2,6 @@ import { config } from "./config";
 import { getToken } from "./localstorage";
 
 const getRequest = async (path) => {
-  console.log(path,'this is our path')
   // console.log(getToken())
   try {
     const params = {
@@ -14,7 +13,6 @@ const getRequest = async (path) => {
     const res = await fetch(config.baseURL + path, params);
     // console.log({ res });
     const data = await res.text();
-    console.log(data,'this is our daat')
     return { statusCode: res.status, data };
   } catch (e) {
     console.error(`error in get Request (${path}) :- `, e);
@@ -32,7 +30,6 @@ const postRequest = async (path, body) => {
       },
       body: JSON.stringify(body),
     };
-    console.log(body,'this is our singin body',config.baseURL + path,'this is our Path.....')
 
     const res = await fetch(config.baseURL + path, params);
     // console.log(res)

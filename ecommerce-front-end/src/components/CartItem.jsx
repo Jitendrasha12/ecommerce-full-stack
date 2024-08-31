@@ -11,7 +11,7 @@ const CartItem = ({ item, qtyChangeHandler, removeHandler }) => {
         <p>{item.name}</p>
       </Link>
       <p className="cartitem__price">${item.price}</p>
-      <select
+      {/* <select
         value={item.qty}
         onChange={(e) => qtyChangeHandler(item.product, e.target.value)}
         className="cartItem__select"
@@ -21,7 +21,7 @@ const CartItem = ({ item, qtyChangeHandler, removeHandler }) => {
             {x + 1}
           </option>
         ))}
-      </select>
+      </select> */}
       <button
         className="cartItem__deleteBtn"
         onClick={() => removeHandler(item.product)}

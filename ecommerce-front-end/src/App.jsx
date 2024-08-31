@@ -1,8 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Components
 import Navbar from './components/Navbar';
@@ -21,7 +20,6 @@ import { fetchCart } from './redux/actions/cartSlice';
 import { setUserDetails } from './redux/actions/userSlice';
 
 // Load your Stripe public key
-const stripePromise = loadStripe('your-publishable-key-here');
 
 function App() {
   const [sideToggle, setSideToggle] = useState(false);
@@ -33,7 +31,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <Elements stripe={stripePromise}>
+   
       <Router>
         <Navbar click={() => setSideToggle(true)} />
         <SideDrawer show={sideToggle} click={() => setSideToggle(false)} />
@@ -47,10 +45,10 @@ function App() {
             <Route exact path="/checkout" element={<CheckoutScreen />} />
             <Route exact path="/signup" element={<SignUp />} />
             <Route exact path="/signin" element={<SignIn />} />
+            <Route exact path="/order-success" element={<HomeScreen />} />
           </Routes>
         </main>
       </Router>
-    </Elements>
   );
 }
 
